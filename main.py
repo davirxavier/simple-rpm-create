@@ -43,7 +43,8 @@ make_tarfile(os.path.join(sources, f'{pname}.tar.gz'), args.pfolder, pname)
 result = list(Path(args.pfolder).rglob("*.*"))
 filesstr = ''
 for f in result:
-    filesstr = f'{filesstr}\n/{str(f).split(os.path.sep, 1)[-1]}'
+    if not os.path.isdir(str(f)):
+        filesstr = f'{filesstr}\n/{str(f).split(os.path.sep, 1)[-1].split(args.pfolder[1:], 1)[-1]}'
 
 with open(specsfile, 'w') as spec:
     spec.write(f'''Name:           {args.pname}
@@ -79,4 +80,4 @@ cp -r %{{_builddir}}/%{{name}}-%{{version}}/* %{{buildroot}}
 subprocess.Popen(['sh', '-c', f'rpmbuild {specsfile} --ba --define "_rpmdir {os.getcwd()}/dest" --define "_topdir {tempdir}"'], cwd=os.getcwd()).communicate()
 
 # Cleanup
-shutil.rmtree(tempdir)
+#shutil.rmtree(tempdir)
